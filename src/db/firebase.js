@@ -13,8 +13,8 @@ const config = {
 firebase.initializeApp(config);
 // const database = firebase.database();
 const firestore = firebase.firestore();
-// const settings = {/* your settings... */ timestampsInSnapshots: true };
-// firestore.settings(settings);
+const settings = {/* your settings... */ timestampsInSnapshots: true };
+firestore.settings(settings);
 // const storage = firebase.storage();
 // const googleAuthProvider = new firebase.auth.GoogleAuthProvider().addScope('https://www.googleapis.com/auth/userinfo.email');
 // const facebookAuthProvider = new firebase.auth.FacebookAuthProvider().addScope('email');
