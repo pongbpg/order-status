@@ -3,7 +3,7 @@ import { Router, Route, Switch, Link, NavLink } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import HomePage from '../components/HomePage';
 import NotFoundPage from '../components/NotFoundPage';
-import { ProductList} from './pages/Products';
+// import { ProductList} from './pages/Products';
 // import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 export const history = createBrowserHistory();
@@ -13,7 +13,7 @@ const AppRouter = () => (
     <div>
       <Switch>
         <PublicRoute path="/"  component={HomePage} exact={true} />
-        <PublicRoute path="/products" component={ProductList} exact={true} />
+        {/* <PublicRoute path="/products" component={ProductList} exact={true} /> */}
         <Route component={NotFoundPage} />
       </Switch>
     </div>
