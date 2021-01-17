@@ -50,17 +50,17 @@ export class AddPage extends React.Component {
                 <div className="row mb-3">
                     <div className="col-12">
                         {/* <label htmlFor="txtCustomer" className="form-label">Example textarea</label> */}
-                        <textarea className="form-control" id="txtCustomer" placeholder="Name" rows="3"
+                        <textarea className="form-control" id="txtCustomer" placeholder="ชื่อ/ที่อยู่" rows="3"
                             value={this.state.order.customer} onChange={this.onCustomerChange}></textarea>
                     </div>
                 </div>
 
                 <div className="row justify-content-center mb-3">
                     <div className="col-sm-5">
-                        <input type="text" id="txtBank" className="form-control" placeholder="Bank" value={this.state.order.bank} onChange={this.onBankChange} />
+                        <input type="text" id="txtBank" className="form-control" placeholder="ธนาคาร" value={this.state.order.bank} onChange={this.onBankChange} />
                     </div>
                     <div className="col-sm-5">
-                        <NumberFormat className="form-control" id="txtPrice" placeholder="Price"
+                        <NumberFormat className="form-control" id="txtPrice" placeholder="จำนวนเงิน"
                             value={this.state.order.price}
                             // allowLeadingZeros={true}
                             thousandSeparator={true}
