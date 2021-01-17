@@ -13,7 +13,8 @@ export class AddPage extends React.Component {
             order: {
                 customer: '',
                 price: 0,
-                bank: ''
+                bank: '',
+                desc: ''
             }
         }
         // this.props.startGetProducts()
@@ -25,6 +26,9 @@ export class AddPage extends React.Component {
     }
     onCustomerChange = (e) => {
         this.setState({ order: { ...this.state.order, customer: e.target.value } })
+    }
+    onDescChange = (e) => {
+        this.setState({ order: { ...this.state.order, desc: e.target.value } })
     }
     onBankChange = (e) => {
         this.setState({ order: { ...this.state.order, bank: e.target.value.toUpperCase() } })
@@ -38,6 +42,7 @@ export class AddPage extends React.Component {
                 customer: '',
                 price: 0,
                 bank: '',
+                desc: '',
                 // selected: false
             }
         })
@@ -56,10 +61,13 @@ export class AddPage extends React.Component {
                 </div>
 
                 <div className="row justify-content-center mb-3">
-                    <div className="col-sm-5">
+                    <div className="col-auto">
+                        <input type="text" id="txtDesc" className="form-control" placeholder="หมายเหตุ" value={this.state.order.desc} onChange={this.onDescChange} />
+                    </div>
+                    <div className="col-auto">
                         <input type="text" id="txtBank" className="form-control" placeholder="ธนาคาร" value={this.state.order.bank} onChange={this.onBankChange} />
                     </div>
-                    <div className="col-sm-5">
+                    <div className="col-auto">
                         <NumberFormat className="form-control" id="txtPrice" placeholder="จำนวนเงิน"
                             value={this.state.order.price}
                             // allowLeadingZeros={true}

@@ -15,6 +15,8 @@ export class ListPage extends React.Component {
             bank: 'all',
             copied: true,
             notcopy: true,
+            search: '',
+            desc: '',
             orders: props.orders
         }
         this.props.startListOrder()
@@ -34,7 +36,7 @@ export class ListPage extends React.Component {
         selection.removeAllRanges();
         selection.addRange(range);
         document.execCommand("copy");
-        alert('Copied! ' + copyText.innerText)
+        alert('คัดลอกข้อความ!\n"' + copyText.innerText + '"')
         this.props.startCopyOrder(id)
     }
     onReset = (id) => {
@@ -57,6 +59,12 @@ export class ListPage extends React.Component {
     onNotCopyChange = (e) => {
         this.setState({ notcopy: e.target.checked })
     }
+    onSearchChange = (e) => {
+        this.setState({ search: e.target.value })
+    }
+    onDescChange = (e) => {
+        this.setState({ desc: e.target.value })
+    }
     render() {
         let sumPrice = 0;
         var groupDate = _.chain(this.state.orders).groupBy("date").map(function (offers, date) {
@@ -75,16 +83,8 @@ export class ListPage extends React.Component {
                 <div className="col-12">
                     <table className="table table-bordered ">
                         <thead>
-                            <tr>
-                                <th scope="col">ลำดับ.</th>
-                                <th scope="col">วันที่</th>
-                                <th scope="col">ชื่อที่อยู่</th>
-                                <th scope="col">ธนาคาร</th>
-                                <th scope="col">ราคา</th>
-                                <th scope="col">จัดการ</th>
-                            </tr>
                             {this.state.orders.length > 0 && <tr>
-                                <th></th>
+                                <th>ค้นหา</th>
                                 <th>
                                     <select className="form-select" onChange={this.onDateChange} value={this.state.date}>
                                         <option value="all">ทุกวัน</option>
@@ -93,7 +93,8 @@ export class ListPage extends React.Component {
                                         })}
                                     </select>
                                 </th>
-                                <th></th>
+                                <th><input type="text" placeholder="ชื่อที่อยู่" className="form-control" value={this.state.search} onChange={this.onSearchChange} /></th>
+                                <th><input type="text" placeholder="หมายเหตุ" className="form-control" value={this.state.desc} onChange={this.onDescChange} /></th>
                                 <th>
                                     <select className="form-select" onChange={this.onBankChange} value={this.state.bank}>
                                         <option value="all">ทั้งหมด</option>
@@ -119,25 +120,38 @@ export class ListPage extends React.Component {
                                     </div>
                                 </th>
                             </tr>}
+
+                            <tr>
+                                <th scope="col">ลำดับ.</th>
+                                <th scope="col">วันที่</th>
+                                <th scope="col">ชื่อที่อยู่</th>
+                                <th scope="col">หมายเหตุ</th>
+                                <th scope="col">ธนาคาร</th>
+                                <th scope="col">ราคา</th>
+                                <th scope="col">จัดการ</th>
+                            </tr>
                         </thead>
                         <tbody>
                             {this.state.orders.length > 0 ?
                                 this.state.orders.filter(f => {
                                     return (f.date == this.state.date || this.state.date == 'all')
                                         && (f.bank == this.state.bank || this.state.bank == 'all')
-                                        && ((f.selected  == this.state.copied) || (f.selected == !this.state.notcopy))
+                                        && ((f.selected == this.state.copied) || (f.selected == !this.state.notcopy))
+                                        && (f.customer.toLowerCase().includes(this.state.search.toLowerCase()))
+                                        && (f.desc.toLowerCase().includes(this.state.desc.toLowerCase()))
                                 }).map((o, i) => {
                                     sumPrice += o.price;
                                     return (<tr key={o.id} className={`${o.selected && 'table-success'}`}>
                                         <td>{this.state.orders.length - i}</td>
                                         <td>{moment(o.date).format('ll')}</td>
                                         <td id={'cp' + o.id}>{o.customer}</td>
+                                        <td>{o.desc}</td>
                                         <td>{o.bank}</td>
                                         <td className="text-right">{Money(o.price, 2)}</td>
                                         <td>
-                                            <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success btn-md mr-1">Copy</button>
-                                            <button type="button" onClick={() => this.onReset(o.id)} className="btn btn-warning mr-1">Reset</button>
-                                            <button type="button" onClick={() => this.onRemove(o.id)} className="btn btn-danger mr-1">Delete</button>
+                                            {o.selected == false && <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success btn-md mr-1">สั่งแล้ว</button>}
+                                            {o.selected == true && <button type="button" onClick={() => this.onReset(o.id)} className="btn btn-warning mr-1">ยกเลิก</button>}
+                                            <button type="button" onClick={() => this.onRemove(o.id)} className="btn btn-danger mr-1">ลบ</button>
                                         </td>
                                     </tr>)
                                 })
@@ -147,7 +161,7 @@ export class ListPage extends React.Component {
                                     </tr>
                                 )}
                             <tr>
-                                <td colSpan={4} className="font-weight-bold text-center">รวม</td>
+                                <td colSpan={5} className="font-weight-bold text-center">รวม</td>
                                 <td className="font-weight-bold text-right">{Money(sumPrice, 2)}</td>
                                 <td></td>
                             </tr>
