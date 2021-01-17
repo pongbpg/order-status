@@ -38,7 +38,7 @@ export class AddPage extends React.Component {
                 customer: '',
                 price: 0,
                 bank: '',
-                selected: false
+                // selected: false
             }
         })
     }

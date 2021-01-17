@@ -2,7 +2,7 @@ import db from '../db/firebase';
 import { FaSnapchat } from 'react-icons/fa';
 export const startAddOrder = (order) => {
     return dispatch => {
-        return db.collection('orderx').add(order)
+        return db.collection('orderx').add({...order,selected:false})
         // .then(doc => {
         //     dispatch(ADD_ORDER({ ...order, id: doc.id }))
         // })
