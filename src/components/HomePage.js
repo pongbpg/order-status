@@ -2,6 +2,8 @@ import React from 'react';
 import { history } from '../routers/AppRouter';
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux';
+import OrderAdd from './orders/Add'
+import OrderList from './orders/List'
 export class HomePage extends React.Component {
   constructor(props) {
     super(props);
@@ -15,8 +17,9 @@ export class HomePage extends React.Component {
 
   render() {
     return (
-      <div>
-        <Link to="/products">ตารางสินค้า</Link>
+      <div className="container">
+        <OrderAdd />
+        <OrderList />
       </div>
     );
   }

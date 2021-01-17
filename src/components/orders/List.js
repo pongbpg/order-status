@@ -1,0 +1,94 @@
+import React from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { history } from '../../routers/AppRouter';
+import { startListOrder, startCopyOrder, startResetOrder, startRemoveOrder } from '../../actions/orders';
+import moment from 'moment';
+import Money from '../../selectors/money'
+moment.locale('th');
+export class ListPage extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            orders: props.orders
+        }
+        this.props.startListOrder()
+    }
+    componentWillReceiveProps(nextProps) {
+        if (JSON.stringify(nextProps.orders) != JSON.stringify(this.state.orders)) {
+            this.setState({ orders: nextProps.orders });
+        }
+    }
+    onCopy = (id) => {
+        console.log('orderid', id)
+        const copyText = document.getElementById('cp' + id);
+        var selection = window.getSelection();
+        var range = document.createRange();
+
+        range.selectNodeContents(copyText);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        document.execCommand("copy");
+        alert('Copied! ' + copyText.innerText)
+        this.props.startCopyOrder(id)
+    }
+    onReset = (id) => {
+        if (confirm('Are you sure to reset this item?'))
+            this.props.startResetOrder(id)
+    }
+    onRemove = (id) => {
+        if (confirm('Are you sure to delete this item?'))
+            this.props.startRemoveOrder(id)
+    }
+    render() {
+
+        return (
+            <table className="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">No.</th>
+                        <th scope="col">วันที่</th>
+                        <th scope="col">ชื่อที่อยู่</th>
+                        <th scope="col">ธนาคาร</th>
+                        <th scope="col">ราคา</th>
+                        <th scope="col">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {this.state.orders.length > 0 ?
+                        this.state.orders.map((o, i) => {
+                            return (<tr key={o.id} className={`${o.selected && 'table-success'}`}>
+                                <td>{this.state.orders.length - i}</td>
+                                <td>{moment(o.date).format('ll')}</td>
+                                <td id={'cp' + o.id}>{o.customer}</td>
+                                <td>{o.bank}</td>
+                                <td>{Money(o.price, 2)}</td>
+                                <td>
+                                    <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success mr-4">Copy</button>
+                                    <button type="button" onClick={() => this.onReset(o.id)} className="btn btn-warning mr-4">Reset</button>
+                                    <button type="button" onClick={() => this.onRemove(o.id)} className="btn btn-danger mr-4">Delete</button>
+                                </td>
+                            </tr>)
+                        })
+                        : (
+                            <tr>
+
+                            </tr>
+                        )}
+                </tbody>
+            </table>
+        );
+    }
+}
+
+const mapStateToProps = (state) => ({
+    orders: state.orders.sort((a, b) => a.created > b.created ? -1 : 1)
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    startListOrder: () => dispatch(startListOrder()),
+    startCopyOrder: (orderid) => dispatch(startCopyOrder(orderid)),
+    startResetOrder: (orderid) => dispatch(startResetOrder(orderid)),
+    startRemoveOrder: (orderid) => dispatch(startRemoveOrder(orderid)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ListPage);

@@ -14,7 +14,7 @@ export const PublicRoute = ({
                     <section>
                         <Header />
                         <div className="row">
-                            <div className="col-1"><SideBar /></div>
+                            {/* <div className="col-1"><SideBar /></div> */}
                             <div className="col"><Component {...props} /></div>
                         </div>
                     </section>
