@@ -5,10 +5,10 @@ const app = express();
 const publicPath = path.join(__dirname, '..', 'public');
 const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser')
-const cors = require('cors');
+// const cors = require('cors');
 const moment = require('moment');
-const mariadb = require('./mariadb');
-const routers = require('./routes/index');
+// const mariadb = require('./mariadb');
+// const routers = require('./routes/index');
 // const jwt = require('jsonwebtoken')
 moment.locale('th');
 
@@ -30,8 +30,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(cors());
 
 //mariadb
-app.use(mariadb);
-app.use('/api', routers);
+// app.use(mariadb);
+// app.use('/api', routers);
 
 //html
 app.use(compression());
