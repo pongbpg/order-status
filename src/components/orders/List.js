@@ -149,7 +149,7 @@ export class ListPage extends React.Component {
                                         <td>{o.bank}</td>
                                         <td className="text-right">{Money(o.price, 2)}</td>
                                         <td>
-                                            {o.selected == false && <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success btn-md mr-1">สั่งแล้ว</button>}
+                                            {o.selected == false && <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success mr-1">สั่งแล้ว</button>}
                                             {o.selected == true && <button type="button" onClick={() => this.onReset(o.id)} className="btn btn-warning mr-1">ยกเลิก</button>}
                                             <button type="button" onClick={() => this.onRemove(o.id)} className="btn btn-danger mr-1">ลบ</button>
                                         </td>

@@ -60,14 +60,14 @@ export class AddPage extends React.Component {
                     </div>
                 </div>
 
-                <div className="row justify-content-center mb-3">
-                    <div className="col-auto">
+                <div className="row mb-3">
+                    <div className="col-6">
                         <input type="text" id="txtDesc" className="form-control" placeholder="หมายเหตุ" value={this.state.order.desc} onChange={this.onDescChange} />
                     </div>
-                    <div className="col-auto">
+                    <div className="col-2">
                         <input type="text" id="txtBank" className="form-control" placeholder="ธนาคาร" value={this.state.order.bank} onChange={this.onBankChange} />
                     </div>
-                    <div className="col-auto">
+                    <div className="col-2">
                         <NumberFormat className="form-control" id="txtPrice" placeholder="จำนวนเงิน"
                             value={this.state.order.price}
                             // allowLeadingZeros={true}
@@ -77,8 +77,8 @@ export class AddPage extends React.Component {
                                 this.setState({ order: { ...this.state.order, price: floatValue } })
                             }} />
                     </div>
-                    <div className="col-sm-2">
-                        <button className="btn btn-primary" onClick={this.onSubmit}>เพิ่มข้อมูล</button>
+                    <div className="col-2 row justify-content-center">
+                        <button className="btn btn-primary" onClick={this.onSubmit}>เพิ่ม</button>
                     </div>
                 </div>
             </form>
