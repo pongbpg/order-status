@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { history } from '../../routers/AppRouter';
 import { startListOrder, startCopyOrder, startResetOrder, startRemoveOrder } from '../../actions/orders';
 import moment from 'moment';
+import { storage } from '../../db/firebase';
 import Money from '../../selectors/money'
 import _ from 'underscore'
 moment.locale('th');
@@ -67,59 +68,61 @@ export class ListPage extends React.Component {
     }
     render() {
         let sumPrice = 0;
-        var groupDate = _.chain(this.state.orders).groupBy("date").map(function (offers, date) {
-            return {
-                date
-            };
-        }).value();
-        var groupBank = _.chain(this.state.orders).groupBy("bank").map(function (offers, bank) {
-            return {
-                bank
-            };
-        }).value();
+        var groupDate = _.chain(this.state.orders).groupBy("date").map((offers, date) => ({ date })).value();
+        var groupBank = _.chain(this.state.orders).groupBy("bank").map((offers, bank) => ({ bank })).value();
         // console.log(groupDate)
+        var orders = this.state.orders.length > 0 ? this.state.orders.filter(f => {
+            return (f.date == this.state.date || this.state.date == 'all')
+                && (f.bank == this.state.bank || this.state.bank == 'all')
+                && ((f.selected == this.state.copied) || (f.selected == !this.state.notcopy))
+                && (f.customer.toLowerCase().includes(this.state.search.toLowerCase()))
+                && (f.desc.toLowerCase().includes(this.state.desc.toLowerCase()))
+        }) : this.state.orders;
         return (
             <div className="row">
                 <div className="col-12">
                     <table className="table table-bordered ">
                         <thead>
-                            {this.state.orders.length > 0 && <tr>
-                                <th>ค้นหา</th>
-                                <th>
-                                    <select className="form-select" onChange={this.onDateChange} value={this.state.date}>
-                                        <option value="all">ทุกวัน</option>
-                                        {groupDate.map(m => {
-                                            return (<option key={m.date} value={m.date}>{moment(m.date).format('ll')}</option>)
-                                        })}
-                                    </select>
-                                </th>
-                                <th><input type="text" placeholder="ชื่อที่อยู่" className="form-control" value={this.state.search} onChange={this.onSearchChange} /></th>
-                                <th><input type="text" placeholder="หมายเหตุ" className="form-control" value={this.state.desc} onChange={this.onDescChange} /></th>
-                                <th>
-                                    <select className="form-select" onChange={this.onBankChange} value={this.state.bank}>
-                                        <option value="all">ทั้งหมด</option>
-                                        {groupBank.map(m => {
-                                            return (<option key={m.bank} value={m.bank}>{m.bank}</option>)
-                                        })}
-                                    </select>
-                                </th>
-                                <th>
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="checkbox" checked={this.state.copied} value={this.state.copied} id="flexCheckDefault" onChange={this.onCopyChange} />
-                                        <label className="form-check-label" htmlFor="flexCheckDefault">
-                                            สั่งแล้ว
+
+                            {this.state.orders.length > 0 &&
+                                <tr>
+                                    <th>ค้นหา</th>
+                                    <th>
+                                        <select className="form-select" onChange={this.onDateChange} value={this.state.date}>
+                                            <option value="all">ทุกวัน</option>
+                                            {groupDate.map(m => {
+                                                return (<option key={m.date} value={m.date}>{moment(m.date).format('ll')}</option>)
+                                            })}
+                                        </select>
+                                    </th>
+                                    <th><input type="text" placeholder="ชื่อที่อยู่" className="form-control" value={this.state.search} onChange={this.onSearchChange} /></th>
+                                    <th><input type="text" placeholder="หมายเหตุ" className="form-control" value={this.state.desc} onChange={this.onDescChange} /></th>
+                                    <th>
+                                        <select className="form-select" onChange={this.onBankChange} value={this.state.bank}>
+                                            <option value="all">ทั้งหมด</option>
+                                            {groupBank.map(m => {
+                                                return (<option key={m.bank} value={m.bank}>{m.bank}</option>)
+                                            })}
+                                        </select>
+                                    </th>
+                                    <th></th>
+                                    <th>
+                                        <div className="form-check">
+                                            <input className="form-check-input" type="checkbox" checked={this.state.copied} value={this.state.copied} id="flexCheckDefault" onChange={this.onCopyChange} />
+                                            <label className="form-check-label" htmlFor="flexCheckDefault">
+                                                สั่งแล้ว
                                         </label>
-                                    </div>
-                                </th>
-                                <th>
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="checkbox" checked={this.state.notcopy} value={this.state.notcopy} id="flexCheckChecked" onChange={this.onNotCopyChange} />
-                                        <label className="form-check-label" htmlFor="flexCheckChecked">
-                                            ยังไม่สั่ง
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div className="form-check">
+                                            <input className="form-check-input" type="checkbox" checked={this.state.notcopy} value={this.state.notcopy} id="flexCheckChecked" onChange={this.onNotCopyChange} />
+                                            <label className="form-check-label" htmlFor="flexCheckChecked">
+                                                ยังไม่สั่ง
                                         </label>
-                                    </div>
-                                </th>
-                            </tr>}
+                                        </div>
+                                    </th>
+                                </tr>}
 
                             <tr>
                                 <th scope="col">ลำดับ.</th>
@@ -128,41 +131,44 @@ export class ListPage extends React.Component {
                                 <th scope="col">หมายเหตุ</th>
                                 <th scope="col">ธนาคาร</th>
                                 <th scope="col">ราคา</th>
+                                <th scope="col">รูปภาพ</th>
                                 <th scope="col">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
                             {this.state.orders.length > 0 ?
-                                this.state.orders.filter(f => {
-                                    return (f.date == this.state.date || this.state.date == 'all')
-                                        && (f.bank == this.state.bank || this.state.bank == 'all')
-                                        && ((f.selected == this.state.copied) || (f.selected == !this.state.notcopy))
-                                        && (f.customer.toLowerCase().includes(this.state.search.toLowerCase()))
-                                        && (f.desc.toLowerCase().includes(this.state.desc.toLowerCase()))
-                                }).map((o, i) => {
+                                orders.map((o, i) => {
                                     sumPrice += o.price;
                                     return (<tr key={o.id} className={`${o.selected && 'table-success'}`}>
-                                        <td>{this.state.orders.length - i}</td>
-                                        <td>{moment(o.date).format('ll')}</td>
+                                        <td>{orders.length - i}</td>
+                                        <td>{moment.unix(o.created).format('lll')}</td>
                                         <td id={'cp' + o.id}>{o.customer}</td>
                                         <td>{o.desc}</td>
                                         <td>{o.bank}</td>
                                         <td className="text-right">{Money(o.price, 2)}</td>
                                         <td>
-                                            {o.selected == false && <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success mr-1">สั่งแล้ว</button>}
-                                            {o.selected == true && <button type="button" onClick={() => this.onReset(o.id)} className="btn btn-warning mr-1">ยกเลิก</button>}
-                                            <button type="button" onClick={() => this.onRemove(o.id)} className="btn btn-danger mr-1">ลบ</button>
+                                            {o.filenames.length > 0 && o.filenames.map(f => {
+                                                return (<a key={f.filename} className="m-2" href={`https://firebasestorage.googleapis.com/v0/b/${f.bucket}/o/uploads%2F${f.filename}?alt=media`} target="_blank">
+                                                    <img style={{ maxWidth: '100px' }} tag="download" src={`https://firebasestorage.googleapis.com/v0/b/${f.bucket}/o/uploads%2F${f.filename}?alt=media`}></img>
+                                                </a>)
+                                            })}
+                                        </td>
+                                        <td>
+                                            {o.selected == false && <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success btn-sm">สั่งแล้ว</button>}
+                                            {o.selected == true && <button type="button" onClick={() => this.onReset(o.id)} className="btn btn-warning btn-sm">ยกเลิก</button>}
+                                            <button type="button" onClick={() => this.onRemove(o.id)} className="btn btn-danger m-1 btn-sm">ลบ</button>
                                         </td>
                                     </tr>)
                                 })
                                 : (
                                     <tr>
-                                        <td colSpan="6" className="text-center">ไม่มีรายการ</td>
+                                        <td colSpan="7" className="text-center">ไม่มีรายการ</td>
                                     </tr>
                                 )}
                             <tr>
                                 <td colSpan={5} className="font-weight-bold text-center">รวม</td>
                                 <td className="font-weight-bold text-right">{Money(sumPrice, 2)}</td>
+                                <td></td>
                                 <td></td>
                             </tr>
                         </tbody>
