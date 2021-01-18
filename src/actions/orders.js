@@ -60,13 +60,11 @@ export const SET_ORDERS = (orders) => ({
     type: 'SET_ORDERS',
     orders
 });
-
 export const startCopyOrder = (orderid) => {
     return dispatch => {
         return db.collection('orderx').doc(orderid).update({ selected: true })
     }
 }
-
 export const startResetOrder = (orderid) => {
     return dispatch => {
         return db.collection('orderx').doc(orderid).update({ selected: false })
