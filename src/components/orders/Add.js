@@ -48,7 +48,7 @@ export class AddPage extends React.Component {
         e.preventDefault();
         // this.state.pictures.map((p, i) => console.log(p))
         this.props.startAddOrder({ ...this.state.order, created: moment().unix(), date: moment().format('YYYYMMDD') }, this.state.pictures)
-            // .then(() => console.log('add ok'))
+        // .then(() => console.log('add ok'))
         this.setState({
             order: {
                 customer: '',
@@ -106,8 +106,8 @@ export class AddPage extends React.Component {
                             ref={this.myRef}
                         />
                     </div>
-                    <div className="col-sm-12 col-md-12 col-12 row justify-content-center mt-sm-2 mt-2">
-                        <button className={`btn btn-primary d-grid gab-2 ${this.state.disabled && 'disabled'}`} onClick={this.onSubmit}>เพิ่ม</button>
+                    <div className="col-sm-12 col-md-12 col-12 row justify-content-center mt-sm-2 mt-2 mx-auto">
+                        <button type="button" className={`btn btn-primary btn-block ${this.state.disabled ? 'disabled' : ''}`} onClick={this.onSubmit}>เพิ่มข้อมูล</button>
                     </div>
                 </div>
             </form>

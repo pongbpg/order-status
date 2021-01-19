@@ -28,7 +28,7 @@ export class ListPage extends React.Component {
         }
     }
     onCopy = (id) => {
-        console.log('orderid', id)
+        // console.log('orderid', id)
         const copyText = document.getElementById('cp' + id);
         var selection = window.getSelection();
         var range = document.createRange();
@@ -67,7 +67,6 @@ export class ListPage extends React.Component {
         this.setState({ desc: e.target.value })
     }
     render() {
-        let sumPrice = 0;
         var groupDate = _.chain(this.state.orders).groupBy("date").map((offers, date) => ({ date })).value();
         var groupBank = _.chain(this.state.orders).groupBy("bank").map((offers, bank) => ({ bank })).value();
         // console.log(groupDate)
@@ -78,6 +77,7 @@ export class ListPage extends React.Component {
                 && (f.customer.toLowerCase().includes(this.state.search.toLowerCase()))
                 && (f.desc.toLowerCase().includes(this.state.desc.toLowerCase()))
         }) : this.state.orders;
+        const sumPrice = _.chain(orders).reduce((l, r) => l + r.price, 0).value();
         return (
             <div className="row">
                 <div className="col-12">
@@ -136,9 +136,14 @@ export class ListPage extends React.Component {
                             </tr>
                         </thead>
                         <tbody>
+                            <tr>
+                                <td colSpan={5} className="font-weight-bold text-center">รวม</td>
+                                <td className="font-weight-bold text-right">{Money(sumPrice, 2)}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
                             {this.state.orders.length > 0 ?
                                 orders.map((o, i) => {
-                                    sumPrice += o.price;
                                     return (<tr key={o.id} className={`${o.selected && 'table-success'}`}>
                                         <td>{orders.length - i}</td>
                                         <td>{moment.unix(o.created).format('lll')}</td>

@@ -18,7 +18,7 @@ export class HomePage extends React.Component {
   render() {
     return (
       <div className="container">
-        <div className="col-auto mb-5">
+        <div className="col-auto mt-3">
           <OrderAdd />
         </div>
         <div className="col-auto mb-3">
