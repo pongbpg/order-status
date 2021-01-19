@@ -13,7 +13,7 @@ export class AddPage extends React.Component {
         this.state = {
             order: {
                 customer: '',
-                price: 0,
+                price: '',
                 bank: '',
                 desc: '',
             },
@@ -52,7 +52,7 @@ export class AddPage extends React.Component {
         this.setState({
             order: {
                 customer: '',
-                price: 0,
+                price: '',
                 bank: '',
                 desc: '',
                 // selected: false
