@@ -25,9 +25,9 @@ export const startAddOrder = (order, pictures) => {
         ]).then(values => {
             // console.log('ccc')
             // console.log(values)
-            setTimeout(()=> db.collection('orderx').add({ ...order, filenames, selected: false }),pictures.length * 2000)
+            setTimeout(() => db.collection('orderx').add({ ...order, filenames, selected: false }), pictures.length * 2000)
         })
-       
+
         // .then(doc => {
         //     dispatch(ADD_ORDER({ ...order, id: doc.id }))
         // })
@@ -40,7 +40,7 @@ export const ADD_ORDER = (order) => ({
 
 export const startListOrder = () => {
     return dispatch => {
-        return db.collection('orderx').orderBy('created', 'desc').limit(100)
+        return db.collection('orderx').orderBy('created', 'desc')//.limit(100)
             .onSnapshot(snapShot => {
                 let data = [];
                 snapShot.forEach(doc => {
@@ -65,9 +65,9 @@ export const startCopyOrder = (orderid) => {
         return db.collection('orderx').doc(orderid).update({ selected: true })
     }
 }
-export const startResetOrder = (orderid) => {
+export const startCancelOrder = (orderid) => {
     return dispatch => {
-        return db.collection('orderx').doc(orderid).update({ selected: false })
+        return db.collection('orderx').doc(orderid).update({ canceled: true })
     }
 }
 export const startRemoveOrder = (orderid) => {

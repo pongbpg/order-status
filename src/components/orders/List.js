@@ -2,10 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { history } from '../../routers/AppRouter';
-import { startListOrder, startCopyOrder, startResetOrder, startRemoveOrder } from '../../actions/orders';
+import { startListOrder, startCopyOrder, startCancelOrder, startRemoveOrder } from '../../actions/orders';
 import moment from 'moment';
 import { storage } from '../../db/firebase';
 import Money from '../../selectors/money'
+import { Button, Modal } from 'react-bootstrap'
 import _ from 'underscore'
 moment.locale('th');
 export class ListPage extends React.Component {
@@ -18,9 +19,14 @@ export class ListPage extends React.Component {
             notcopy: true,
             search: '',
             desc: '',
-            orders: props.orders
+            orders: props.orders,
+            bankModal: false,
+            bankInput: '',
+            id: ''
         }
-        this.props.startListOrder()
+        this.props.startListOrder();
+        this.onBankClick = this.onBankClick.bind(this)
+        this.handleModalShowHide = this.handleModalShowHide.bind(this)
     }
     componentWillReceiveProps(nextProps) {
         if (JSON.stringify(nextProps.orders) != JSON.stringify(this.state.orders)) {
@@ -41,8 +47,8 @@ export class ListPage extends React.Component {
         this.props.startCopyOrder(id)
     }
     onReset = (id) => {
-        if (confirm('Are you sure to reset this item?'))
-            this.props.startResetOrder(id)
+        if (confirm('Are you sure to cancel this item?'))
+            this.props.startCancelOrder(id)
     }
     onRemove = (id) => {
         if (confirm('Are you sure to delete this item?'))
@@ -66,6 +72,13 @@ export class ListPage extends React.Component {
     onDescChange = (e) => {
         this.setState({ desc: e.target.value })
     }
+    onBankClick = (id) => {
+        console.log(id)
+        this.setState({ bankModal: true, bankInput: '', id })
+    }
+    handleModalShowHide = () => {
+        this.setState({ bankModal: null, bankInput: '', id: '' })
+    }
     render() {
         var groupDate = _.chain(this.state.orders).groupBy("date").map((offers, date) => ({ date })).value();
         var groupBank = _.chain(this.state.orders).groupBy("bank").map((offers, bank) => ({ bank })).value();
@@ -77,13 +90,12 @@ export class ListPage extends React.Component {
                 && (f.customer.toLowerCase().includes(this.state.search.toLowerCase()))
                 && (f.desc.toLowerCase().includes(this.state.desc.toLowerCase()))
         }) : this.state.orders;
-        const sumPrice = _.chain(orders).reduce((l, r) => l + r.price, 0).value();
+        const sumPrice = _.chain(orders).filter(f => f.canceled == null).reduce((l, r) => l + r.price, 0).value();
         return (
             <div className="row">
                 <div className="col-12">
                     <table className="table table-bordered ">
                         <thead>
-
                             {this.state.orders.length > 0 &&
                                 <tr>
                                     <th>ค้นหา</th>
@@ -144,12 +156,16 @@ export class ListPage extends React.Component {
                             </tr>
                             {this.state.orders.length > 0 ?
                                 orders.map((o, i) => {
-                                    return (<tr key={o.id} className={`${o.selected && 'table-success'}`}>
+                                    return (<tr key={o.id} className={`${o.selected && 'table-success'}`} style={{ textDecoration: o.canceled ? 'line-through' : '' }}>
                                         <td>{orders.length - i}</td>
                                         <td>{moment.unix(o.created).format('lll')}</td>
                                         <td id={'cp' + o.id}>{o.customer}</td>
                                         <td>{o.desc}</td>
-                                        <td>{o.bank}</td>
+                                        <td>
+                                            {o.bank == ''
+                                                ? <button className="btn btn-info" onClick={() => this.onBankClick(o.id)}>เพิ่ม</button>
+                                                : o.bank}
+                                        </td>
                                         <td className="text-right">{Money(o.price, 2)}</td>
                                         <td>
                                             {o.filenames.length > 0 && o.filenames.map(f => {
@@ -159,8 +175,8 @@ export class ListPage extends React.Component {
                                             })}
                                         </td>
                                         <td>
-                                            {o.selected == false && <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success btn-sm">สั่งแล้ว</button>}
-                                            {o.selected == true && <button type="button" onClick={() => this.onReset(o.id)} className="btn btn-warning btn-sm">ยกเลิก</button>}
+                                            {(o.selected == false && o.canceled == null) && <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success btn-sm">สั่งแล้ว</button>}
+                                            {(o.selected == true && o.canceled == null) && <button type="button" onClick={() => this.onReset(o.id)} className="btn btn-warning btn-sm">ยกเลิก</button>}
                                             <button type="button" onClick={() => this.onRemove(o.id)} className="btn btn-danger m-1 btn-sm">ลบ</button>
                                         </td>
                                     </tr>)
@@ -179,7 +195,20 @@ export class ListPage extends React.Component {
                         </tbody>
                     </table>
                 </div>
-
+                <Modal show={this.state.bankModal}>
+                    <Modal.Header closeButton onClick={() => this.handleModalShowHide()}>
+                        <Modal.Title>Modal heading</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.handleModalShowHide()}>
+                            Close
+                    </Button>
+                        <Button variant="primary" onClick={() => this.handleModalShowHide()}>
+                            Save Changes
+                    </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         );
     }
@@ -192,7 +221,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     startListOrder: () => dispatch(startListOrder()),
     startCopyOrder: (orderid) => dispatch(startCopyOrder(orderid)),
-    startResetOrder: (orderid) => dispatch(startResetOrder(orderid)),
+    startCancelOrder: (orderid) => dispatch(startCancelOrder(orderid)),
     startRemoveOrder: (orderid) => dispatch(startRemoveOrder(orderid)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ListPage);
