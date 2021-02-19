@@ -168,11 +168,12 @@ export class ListPage extends React.Component {
                                         </td>
                                         <td className="text-right">{Money(o.price, 2)}</td>
                                         <td>
-                                            {o.filenames.length > 0 && o.filenames.map(f => {
+                                            image
+                                            {/* {o.filenames.length > 0 && o.filenames.map(f => {
                                                 return (<a key={f.filename} className="m-2" href={`https://firebasestorage.googleapis.com/v0/b/${f.bucket}/o/uploads%2F${f.filename}?alt=media`} target="_blank">
                                                     <img style={{ maxWidth: '100px' }} tag="download" src={`https://firebasestorage.googleapis.com/v0/b/${f.bucket}/o/uploads%2F${f.filename}?alt=media`}></img>
                                                 </a>)
-                                            })}
+                                            })} */}
                                         </td>
                                         <td>
                                             {(o.selected == false && o.canceled == null) && <button type="button" onClick={() => this.onCopy(o.id)} className="btn btn-success btn-sm">สั่งแล้ว</button>}
