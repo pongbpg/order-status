@@ -38,18 +38,15 @@ export const ADD_ORDER = (order) => ({
     order
 });
 
-export const startListOrder = () => {
+export const startListOrder = (page = 0) => {
     return dispatch => {
-        return db.collection('orderx').orderBy('created', 'desc')//.limit(100)
+        return db.collection('orderx').orderBy('created', 'desc')
             .onSnapshot(snapShot => {
                 let data = [];
                 snapShot.forEach(doc => {
-                    // const filenames = doc.get('filenames') || [];
-                    // filenames.map(m=>({...m,url:storage.ref('uploads').child}))
                     data.push({
                         id: doc.id,
                         ...doc.data(),
-                        // filenames: 
                     })
                 })
                 dispatch(SET_ORDERS(data))
@@ -61,13 +58,15 @@ export const SET_ORDERS = (orders) => ({
     orders
 });
 export const startCopyOrder = (orderid) => {
+    console.log('start copied!', orderid)
     return dispatch => {
         return db.collection('orderx').doc(orderid).update({ selected: true })
     }
 }
 export const startCancelOrder = (orderid) => {
+    console.log('start canceled!', orderid)
     return dispatch => {
-        return db.collection('orderx').doc(orderid).update({ canceled: true })
+        return db.collection('orderx').doc(orderid).update({ selected: false })
     }
 }
 export const startRemoveOrder = (orderid) => {
